@@ -68,7 +68,7 @@ private:
     mutable std::mutex state_mutex_;
     double desired_position_{0.0};
     double desired_max_effort_{10.0};
-    double position_kp_{50.0};
+    double position_kp_{10.0};
     double position_kd_{1.0};
 
     double last_force_sign_{1.0};
