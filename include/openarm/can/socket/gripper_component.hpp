@@ -34,17 +34,22 @@ public:
     // Gripper-specific controls
     void open(double kp = 50.0, double kd = 1.0);
     void close(double kp = 50.0, double kd = 1.0);
+    void set_position(double position, double kp = 50.0, double kd = 1.0);
+    void apply_force(double force);
+
     damiao_motor::Motor* get_motor() const { return motor_.get(); }
+    double get_measured_force() const { return motor_->get_torque(); }
+    double get_measured_position() const {
+        return motor_to_gripper_position(motor_->get_position());
+    }
 
 private:
     std::unique_ptr<damiao_motor::Motor> motor_;
     std::shared_ptr<damiao_motor::DMCANDevice> motor_device_;
 
-    void set_position(double position, double kp = 50.0, double kd = 1.0);
-
     // The actual physical gripper uses a slider cranker-like mechanism, this mapping is an
     // approximation.
-    double gripper_to_motor_position(double gripper_position) {
+    double gripper_to_motor_position(double gripper_position) const {
         // Map gripper position (0.0=closed, 1.0=open) to motor position
         return (gripper_position - gripper_open_position_) /
                    (gripper_closed_position_ - gripper_open_position_) *
@@ -52,7 +57,7 @@ private:
                motor_open_position_;
     }
 
-    double motor_to_gripper_position(double motor_position) {
+    double motor_to_gripper_position(double motor_position) const {
         // Map motor position back to gripper position (0.0=closed, 1.0=open)
         return (motor_position - motor_open_position_) /
                    (motor_closed_position_ - motor_open_position_) *

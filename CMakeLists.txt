@@ -32,6 +32,7 @@ include(GNUInstallDirs)
 add_library(
   openarm_can
   src/openarm/can/socket/arm_component.cpp
+  src/openarm/can/socket/gripper.cpp
   src/openarm/can/socket/gripper_component.cpp
   src/openarm/can/socket/openarm.cpp
   src/openarm/canbus/can_device_collection.cpp
@@ -61,6 +62,7 @@ if(USE_FILE_SET_HEADERS)
            include
            FILES
            include/openarm/can/socket/arm_component.hpp
+           include/openarm/can/socket/gripper.hpp
            include/openarm/can/socket/gripper_component.hpp
            include/openarm/can/socket/openarm.hpp
            include/openarm/canbus/can_device.hpp

@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <cstring>
 #include <map>
+#include <mutex>
 
 #include "dm_motor_constants.hpp"
 
@@ -29,13 +30,17 @@ class Motor {
 public:
     // Constructor
     Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id);
+    Motor(const Motor& other);
+    Motor& operator=(const Motor& other);
+    Motor(Motor&& other) noexcept;
+    Motor& operator=(Motor&& other) noexcept;
 
     // State getters
-    double get_position() const { return state_q_; }
-    double get_velocity() const { return state_dq_; }
-    double get_torque() const { return state_tau_; }
-    int get_state_tmos() const { return state_tmos_; }
-    int get_state_trotor() const { return state_trotor_; }
+    double get_position() const { std::lock_guard<std::mutex> lock(state_mutex_); return state_q_; }
+    double get_velocity() const { std::lock_guard<std::mutex> lock(state_mutex_); return state_dq_; }
+    double get_torque() const { std::lock_guard<std::mutex> lock(state_mutex_); return state_tau_; }
+    int get_state_tmos() const { std::lock_guard<std::mutex> lock(state_mutex_); return state_tmos_; }
+    int get_state_trotor() const { std::lock_guard<std::mutex> lock(state_mutex_); return state_trotor_; }
 
     // Motor property getters
     uint32_t get_send_can_id() const { return send_can_id_; }
@@ -60,6 +65,7 @@ protected:
     void set_temp_param(int RID, int val);
 
     // Motor identifiers
+    mutable std::mutex state_mutex_;
     uint32_t send_can_id_;
     uint32_t recv_can_id_;
     MotorType motor_type_;

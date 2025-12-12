@@ -21,6 +21,7 @@
 #include <linux/can/raw.h>
 
 #include <openarm/can/socket/arm_component.hpp>
+#include <openarm/can/socket/gripper.hpp>
 #include <openarm/can/socket/gripper_component.hpp>
 #include <openarm/can/socket/openarm.hpp>
 #include <openarm/canbus/can_device.hpp>
@@ -367,7 +368,28 @@ NB_MODULE(openarm_can, m) {
              nb::arg("send_can_id"), nb::arg("recv_can_id"), nb::arg("use_fd"))
         .def("open", &GripperComponent::open, nb::arg("kp") = 50.0, nb::arg("kd") = 1.0)
         .def("close", &GripperComponent::close, nb::arg("kp") = 50.0, nb::arg("kd") = 1.0)
+        .def("set_position", &GripperComponent::set_position, nb::arg("position"),
+             nb::arg("kp") = 50.0, nb::arg("kd") = 1.0)
+        .def("apply_force", &GripperComponent::apply_force, nb::arg("force"))
         .def("get_motor", &GripperComponent::get_motor, nb::rv_policy::reference_internal);
+
+    nb::class_<Gripper::State>(m, "GripperState")
+        .def(nb::init<>())
+        .def_rw("position", &Gripper::State::position)
+        .def_rw("velocity", &Gripper::State::velocity)
+        .def_rw("force", &Gripper::State::force)
+        .def_rw("force_holding", &Gripper::State::force_holding)
+        .def_rw("max_effort", &Gripper::State::max_effort);
+
+    nb::class_<Gripper>(m, "Gripper")
+        .def(nb::init<CANSocket&>(), nb::arg("can_socket"))
+        .def("set_position", &Gripper::set_position, nb::arg("position"))
+        .def("set_force", &Gripper::set_force, nb::arg("max_effort"))
+        .def("get_state", &Gripper::get_state)
+        .def("set_pid", &Gripper::set_pid, nb::arg("kp"), nb::arg("kd"))
+        .def("open", &Gripper::open, nb::arg("kp") = 50.0, nb::arg("kd") = 1.0)
+        .def("close", &Gripper::close, nb::arg("kp") = 50.0, nb::arg("kd") = 1.0)
+        .def("update", &Gripper::update);
 
     // OpenArm class (main high-level interface)
     nb::class_<OpenArm>(m, "OpenArm")
@@ -387,5 +409,6 @@ NB_MODULE(openarm_can, m) {
         .def("refresh_all", &OpenArm::refresh_all)
         .def("recv_all", &OpenArm::recv_all, nb::arg("timeout_us") = 500)
         .def("set_callback_mode_all", &OpenArm::set_callback_mode_all, nb::arg("callback_mode"))
-        .def("query_param_all", &OpenArm::query_param_all, nb::arg("rid"));
+        .def("query_param_all", &OpenArm::query_param_all, nb::arg("rid"))
+        .def("update_gripper", &OpenArm::update_gripper);
 }

@@ -41,14 +41,21 @@ arm.recv_all()
 
 # torque control test
 
-arm.get_gripper().mit_control_all([oa.MITParam(0, 0, 0, 0, 0.15)])
 arm.get_arm().mit_control_all(
     [oa.MITParam(0, 0, 0, 0, 0.15), oa.MITParam(0, 0, 0, 0, 0.15)])
+arm.recv_all()
+
+# High-level gripper command with position + max effort
+arm.get_gripper().set_force(0.15)
+arm.get_gripper().set_position(0.0)
+arm.update_gripper()
 arm.recv_all()
 
 # read motor position
 while True:
     arm.refresh_all()
+    arm.recv_all()
+    arm.update_gripper()
     arm.recv_all()
     for motor in arm.get_arm().get_motors():
         print(motor.get_position())

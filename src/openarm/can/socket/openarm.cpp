@@ -25,7 +25,7 @@ OpenArm::OpenArm(const std::string& can_interface, bool enable_fd)
     can_socket_ = std::make_unique<canbus::CANSocket>(can_interface_, enable_fd_);
     master_can_device_collection_ = std::make_unique<canbus::CANDeviceCollection>(*can_socket_);
     arm_ = std::make_unique<ArmComponent>(*can_socket_);
-    gripper_ = std::make_unique<GripperComponent>(*can_socket_);
+    gripper_ = std::make_unique<Gripper>(*can_socket_);
 }
 
 void OpenArm::init_arm_motors(const std::vector<damiao_motor::MotorType>& motor_types,
@@ -45,7 +45,7 @@ void OpenArm::init_arm_motors(const std::vector<damiao_motor::MotorType>& motor_
 void OpenArm::init_gripper_motor(damiao_motor::MotorType motor_type, uint32_t send_can_id,
                                  uint32_t recv_can_id) {
     gripper_->init_motor_device(motor_type, send_can_id, recv_can_id, enable_fd_);
-    register_dm_device_collection(*gripper_);
+    register_dm_device_collection(gripper_->component());
 }
 
 void OpenArm::register_dm_device_collection(damiao_motor::DMDeviceCollection& device_collection) {
@@ -111,6 +111,12 @@ void OpenArm::recv_all(int timeout_us) {
 void OpenArm::query_param_all(int RID) {
     for (damiao_motor::DMDeviceCollection* device_collection : sub_dm_device_collections_) {
         device_collection->query_param_all(RID);
+    }
+}
+
+void OpenArm::update_gripper() {
+    if (gripper_) {
+        gripper_->update();
     }
 }
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <atomic>
 #include <chrono>
 #include <csignal>
 #include <iostream>
@@ -84,14 +83,18 @@ int main() {
         openarm.recv_all(500);
 
         // Control gripper
-        std::cout << "Closing gripper..." << std::endl;
-        openarm.get_gripper().close();
+        std::cout << "Closing gripper with force limit..." << std::endl;
+        openarm.get_gripper().set_force(0.2);
+        openarm.get_gripper().set_position(0.0);
+        openarm.update_gripper();
         openarm.recv_all(1000);
 
         for (int i = 0; i < 10; i++) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             openarm.refresh_all();
+            openarm.recv_all(300);
+            openarm.update_gripper();
             openarm.recv_all(300);
 
             // Display arm motor states

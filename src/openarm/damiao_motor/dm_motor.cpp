@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openarm/damiao_motor/dm_motor.hpp>
-#include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <stdexcept>
 #include <string>
+#include <utility>
+
+#include <openarm/damiao_motor/dm_motor.hpp>
+#include <openarm/damiao_motor/dm_motor_constants.hpp>
 
 namespace openarm::damiao_motor {
 
@@ -30,6 +32,79 @@ Motor::Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id)
       state_tau_(0.0),
       state_tmos_(0),
       state_trotor_(0) {}
+
+Motor::Motor(const Motor& other)
+    : send_can_id_(other.send_can_id_),
+      recv_can_id_(other.recv_can_id_),
+      motor_type_(other.motor_type_),
+      enabled_(other.enabled_),
+      state_q_(0.0),
+      state_dq_(0.0),
+      state_tau_(0.0),
+      state_tmos_(0),
+      state_trotor_(0),
+      temp_param_dict_(other.temp_param_dict_) {
+    std::lock_guard<std::mutex> lock(other.state_mutex_);
+    state_q_ = other.state_q_;
+    state_dq_ = other.state_dq_;
+    state_tau_ = other.state_tau_;
+    state_tmos_ = other.state_tmos_;
+    state_trotor_ = other.state_trotor_;
+}
+
+Motor& Motor::operator=(const Motor& other) {
+    if (this != &other) {
+        std::scoped_lock lock(state_mutex_, other.state_mutex_);
+        send_can_id_ = other.send_can_id_;
+        recv_can_id_ = other.recv_can_id_;
+        motor_type_ = other.motor_type_;
+        enabled_ = other.enabled_;
+        state_q_ = other.state_q_;
+        state_dq_ = other.state_dq_;
+        state_tau_ = other.state_tau_;
+        state_tmos_ = other.state_tmos_;
+        state_trotor_ = other.state_trotor_;
+        temp_param_dict_ = other.temp_param_dict_;
+    }
+    return *this;
+}
+
+Motor::Motor(Motor&& other) noexcept
+    : send_can_id_(other.send_can_id_),
+      recv_can_id_(other.recv_can_id_),
+      motor_type_(other.motor_type_),
+      enabled_(other.enabled_),
+      state_q_(0.0),
+      state_dq_(0.0),
+      state_tau_(0.0),
+      state_tmos_(0),
+      state_trotor_(0),
+      temp_param_dict_() {
+    std::lock_guard<std::mutex> lock(other.state_mutex_);
+    state_q_ = other.state_q_;
+    state_dq_ = other.state_dq_;
+    state_tau_ = other.state_tau_;
+    state_tmos_ = other.state_tmos_;
+    state_trotor_ = other.state_trotor_;
+    temp_param_dict_ = std::move(other.temp_param_dict_);
+}
+
+Motor& Motor::operator=(Motor&& other) noexcept {
+    if (this != &other) {
+        std::scoped_lock lock(state_mutex_, other.state_mutex_);
+        send_can_id_ = other.send_can_id_;
+        recv_can_id_ = other.recv_can_id_;
+        motor_type_ = other.motor_type_;
+        enabled_ = other.enabled_;
+        state_q_ = other.state_q_;
+        state_dq_ = other.state_dq_;
+        state_tau_ = other.state_tau_;
+        state_tmos_ = other.state_tmos_;
+        state_trotor_ = other.state_trotor_;
+        temp_param_dict_ = std::move(other.temp_param_dict_);
+    }
+    return *this;
+}
 
 // Enable methods
 void Motor::set_enabled(bool enable) { this->enabled_ = enable; }
@@ -46,6 +121,7 @@ void Motor::set_temp_param(int RID, int val) { temp_param_dict_[RID] = val; }
 
 // State update methods
 void Motor::update_state(double q, double dq, double tau, int tmos, int trotor) {
+    std::lock_guard<std::mutex> lock(state_mutex_);
     state_q_ = q;
     state_dq_ = dq;
     state_tau_ = tau;

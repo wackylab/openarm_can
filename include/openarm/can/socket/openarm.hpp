@@ -20,6 +20,7 @@
 #include "../../canbus/can_device_collection.hpp"
 #include "../../canbus/can_socket.hpp"
 #include "arm_component.hpp"
+#include "gripper.hpp"
 #include "gripper_component.hpp"
 
 namespace openarm::can::socket {
@@ -41,7 +42,7 @@ public:
 
     // Component access
     ArmComponent& get_arm() { return *arm_; }
-    GripperComponent& get_gripper() { return *gripper_; }
+    Gripper& get_gripper() { return *gripper_; }
     canbus::CANDeviceCollection& get_master_can_device_collection() {
         return *master_can_device_collection_;
     }
@@ -58,13 +59,14 @@ public:
     void recv_all(int timeout_us = 500);
     void set_callback_mode_all(damiao_motor::CallbackMode callback_mode);
     void query_param_all(int RID);
+    void update_gripper();
 
 private:
     std::string can_interface_;
     bool enable_fd_;
     std::unique_ptr<canbus::CANSocket> can_socket_;
     std::unique_ptr<ArmComponent> arm_;
-    std::unique_ptr<GripperComponent> gripper_;
+    std::unique_ptr<Gripper> gripper_;
     std::unique_ptr<canbus::CANDeviceCollection> master_can_device_collection_;
     std::vector<damiao_motor::DMDeviceCollection*> sub_dm_device_collections_;
     void register_dm_device_collection(damiao_motor::DMDeviceCollection& device_collection);
