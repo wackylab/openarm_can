@@ -33,8 +33,8 @@ def main() -> None:
     time.sleep(0.4)
 
     gripper_motor = gripper.get_motors()[0]
-    initial_kp_asr = gripper_motor.get_param(oa.MotorVariable.KP_ASR)
-    initial_ki_asr = gripper_motor.get_param(oa.MotorVariable.KI_ASR)
+    initial_kp_asr = gripper_motor.get_param(int(oa.MotorVariable.KP_ASR))
+    initial_ki_asr = gripper_motor.get_param(int(oa.MotorVariable.KI_ASR))
     print(f"\n=== INITIAL KP/KI VALUES ===")
     print(f"KP_ASR (speed loop Kp): {initial_kp_asr}")
     print(f"KI_ASR (speed loop Ki): {initial_ki_asr}")
@@ -65,12 +65,12 @@ def main() -> None:
     print(f"\n=== WRITING NEW KP/KI VALUES ===")
     print(f"Setting KP_ASR to: {new_kp_asr}")
     print(f"Setting KI_ASR to: {new_ki_asr}")
-    gripper.set_param_one(0, oa.MotorVariable.KP_ASR, new_kp_asr)
-    gripper.set_param_one(0, oa.MotorVariable.KI_ASR, new_ki_asr)
+    gripper.set_param_one(0, int(oa.MotorVariable.KP_ASR), new_kp_asr)
+    gripper.set_param_one(0, int(oa.MotorVariable.KI_ASR), new_ki_asr)
     time.sleep(0.1)
 
-    readback_kp_asr = gripper_motor.get_param(oa.MotorVariable.KP_ASR)
-    readback_ki_asr = gripper_motor.get_param(oa.MotorVariable.KI_ASR)
+    readback_kp_asr = gripper_motor.get_param(int(oa.MotorVariable.KP_ASR))
+    readback_ki_asr = gripper_motor.get_param(int(oa.MotorVariable.KI_ASR))
     print(f"KP_ASR after write: {readback_kp_asr}")
     print(f"KI_ASR after write: {readback_ki_asr}")
     print(f"===============================\n")
