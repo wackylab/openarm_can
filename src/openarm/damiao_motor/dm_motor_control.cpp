@@ -120,10 +120,6 @@ ParamResult CanPacketDecoder::parse_motor_param_data(const std::vector<uint8_t>&
         return {RID, num, true};
     } else {
         std::cerr << "WARNING: INVALID PARAM DATA" << std::endl;
-        std::cerr << "DATA: ";
-        for (const auto& byte : data) {
-            std::cerr << std::hex << static_cast<int>(byte) << " ";
-        }
         return {0, NAN, false};
     }
 }

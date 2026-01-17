@@ -179,17 +179,15 @@ void DMDeviceCollection::posforce_control_all(const std::vector<PosForceParam>& 
     }
 }
 
-const std::vector<Motor>& DMDeviceCollection::get_motors() const {
-    cached_motors_.clear();
+std::vector<Motor> DMDeviceCollection::get_motors() const {
+    std::vector<Motor> motors;
     for (auto dm_device : get_dm_devices()) {
-        cached_motors_.push_back(dm_device->get_motor());
+        motors.push_back(dm_device->get_motor());
     }
-    return cached_motors_;
+    return motors;
 }
 
-const Motor& DMDeviceCollection::get_motor(int i) const {
-    return get_dm_devices().at(i)->get_motor();
-}
+Motor DMDeviceCollection::get_motor(int i) const { return get_dm_devices().at(i)->get_motor(); }
 
 std::vector<std::shared_ptr<DMCANDevice>> DMDeviceCollection::get_dm_devices() const {
     std::vector<std::shared_ptr<DMCANDevice>> dm_devices;

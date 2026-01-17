@@ -19,7 +19,8 @@ import openarm_can as oa
 
 def main() -> None:
     arm = oa.OpenArm("can0", True)
-    arm.init_gripper_motor(oa.MotorType.DM4310, 0x8, 0x18, oa.ControlMode.POS_FORCE)
+    arm.init_gripper_motor(oa.MotorType.DM4310, 0x8,
+                           0x18, oa.ControlMode.POS_FORCE)
 
     arm.enable_all()
     arm.recv_all()
@@ -66,7 +67,8 @@ def main() -> None:
     gripper.query_param_one(0, oa.MotorVariable.KP_APR.value)
     arm.recv_all(500)
     arm.set_callback_mode_all(oa.CallbackMode.STATE)
-    new_kp_apr = gripper.get_motors()[0].get_param(oa.MotorVariable.KP_APR.value)
+    new_kp_apr = gripper.get_motors()[0].get_param(
+        oa.MotorVariable.KP_APR.value)
     print(f"New KP_APR value: {new_kp_apr}\n")
 
     sequence_part1 = [
@@ -92,7 +94,8 @@ def main() -> None:
     gripper.query_param_one(0, oa.MotorVariable.KP_APR.value)
     arm.recv_all(500)
     arm.set_callback_mode_all(oa.CallbackMode.STATE)
-    new_kp_apr = gripper.get_motors()[0].get_param(oa.MotorVariable.KP_APR.value)
+    new_kp_apr = gripper.get_motors()[0].get_param(
+        oa.MotorVariable.KP_APR.value)
     print(f"New KP_APR value: {new_kp_apr}")
 
     sequence_part2 = [

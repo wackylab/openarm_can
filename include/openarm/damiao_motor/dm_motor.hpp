@@ -29,6 +29,12 @@ public:
     // Constructor
     Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id);
 
+    // Copy constructor - deep copy of all members including temp_param_dict_
+    Motor(const Motor& other);
+
+    // Copy assignment operator
+    Motor& operator=(const Motor& other);
+
     // State getters
     double get_position() const { return state_q_; }
     double get_velocity() const { return state_dq_; }
