@@ -67,8 +67,8 @@ public:
     void posforce_control_all(const std::vector<PosForceParam>& posforce_params);
 
     // Device collection access
-    std::vector<Motor> get_motors() const;
-    Motor get_motor(int i) const;
+    const std::vector<Motor>& get_motors() const;
+    const Motor& get_motor(int i) const;
     canbus::CANDeviceCollection& get_device_collection() { return *device_collection_; }
 
 protected:
@@ -76,6 +76,7 @@ protected:
     std::unique_ptr<CanPacketEncoder> can_packet_encoder_;
     std::unique_ptr<CanPacketDecoder> can_packet_decoder_;
     std::unique_ptr<canbus::CANDeviceCollection> device_collection_;
+    mutable std::vector<Motor> cached_motors_;
 
     // Helper methods for subclasses
     void send_command_to_device(std::shared_ptr<DMCANDevice> dm_device, const CANPacket& packet);

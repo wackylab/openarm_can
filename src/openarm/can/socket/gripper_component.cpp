@@ -32,7 +32,6 @@ void GripperComponent::init_motor_device(damiao_motor::MotorType motor_type, uin
     motor_device_ = std::make_shared<damiao_motor::DMCANDevice>(*motor_, CAN_SFF_MASK, use_fd);
     get_device_collection().add_device(motor_device_);
 
-    set_callback_mode_all(damiao_motor::CallbackMode::PARAM);
     set_control_mode_one(0, control_mode);
 }
 

@@ -88,6 +88,8 @@ void DMCANDevice::callback(const canfd_frame& frame) {
     } else if (callback_mode_ == PARAM) {
         ParamResult result = CanPacketDecoder::parse_motor_param_data(data);
         if (result.valid) {
+            std::cout << "Received PARAM RID: " << result.rid << " VALUE: " << result.value
+                      << std::endl;
             motor_.set_temp_param(result.rid, result.value);
         }
     } else if (callback_mode_ == IGNORE) {
