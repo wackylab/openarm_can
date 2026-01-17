@@ -25,7 +25,6 @@ def main() -> None:
     arm.enable_all()
     arm.recv_all()
 
-    arm.set_callback_mode_all(oa.CallbackMode.STATE)
     gripper = arm.get_gripper()
 
     gripper.set_limit(6.0, 0.4)  # speed_rad_s, torque_pu
@@ -33,6 +32,16 @@ def main() -> None:
     time.sleep(0.4)
 
     gripper_motor = gripper.get_motors()[0]
+
+    # Query KP/KI parameters and receive response
+    print("Querying KP_ASR (speed loop Kp)...")
+    gripper.query_param_one(0, oa.MotorVariable.KP_ASR.value)
+    arm.recv_all(500)
+    print("Querying KI_ASR (speed loop Ki)...")
+    gripper.query_param_one(0, oa.MotorVariable.KI_ASR.value)
+    arm.recv_all(500)
+
+    # Read cached values after querying
     initial_kp_asr = gripper_motor.get_param(oa.MotorVariable.KP_ASR.value)
     initial_ki_asr = gripper_motor.get_param(oa.MotorVariable.KI_ASR.value)
     print(f"\n=== INITIAL KP/KI VALUES ===")
