@@ -46,6 +46,10 @@ public:
     void query_param_one(int i, int RID);
     void query_param_all(int RID);
 
+    // Write parameter operations
+    void set_param_one(int i, int RID, float value);
+    void set_param_all(int RID, float value);
+
     // Control mode operations
     void set_control_mode_one(int i, ControlMode mode);
     void set_control_mode_all(ControlMode mode);

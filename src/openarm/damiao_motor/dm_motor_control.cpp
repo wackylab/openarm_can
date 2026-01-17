@@ -58,6 +58,10 @@ CANPacket CanPacketEncoder::create_query_param_command(const Motor& motor, int R
     return {0x7FF, pack_query_param_data(motor.get_send_can_id(), RID)};
 }
 
+CANPacket CanPacketEncoder::create_write_param_command(const Motor& motor, int RID, float value) {
+    return {0x7FF, pack_write_param_data(motor.get_send_can_id(), RID, value)};
+}
+
 CANPacket CanPacketEncoder::create_set_control_mode_command(const Motor& motor, ControlMode mode) {
     uint32_t send_can_id = motor.get_send_can_id();
     return {0x7FF, pack_write_param_data(send_can_id, static_cast<int>(RID::CTRL_MODE), mode)};

@@ -89,6 +89,20 @@ void DMDeviceCollection::query_param_all(int RID) {
     }
 }
 
+void DMDeviceCollection::set_param_one(int i, int RID, float value) {
+    CANPacket param_write =
+        CanPacketEncoder::create_write_param_command(get_dm_devices()[i]->get_motor(), RID, value);
+    send_command_to_device(get_dm_devices()[i], param_write);
+}
+
+void DMDeviceCollection::set_param_all(int RID, float value) {
+    for (auto dm_device : get_dm_devices()) {
+        CANPacket param_write =
+            CanPacketEncoder::create_write_param_command(dm_device->get_motor(), RID, value);
+        send_command_to_device(dm_device, param_write);
+    }
+}
+
 void DMDeviceCollection::set_control_mode_one(int i, ControlMode mode) {
     auto dm_device = get_dm_devices()[i];
     dm_device->set_control_mode(mode);
