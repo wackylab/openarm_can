@@ -390,6 +390,11 @@ NB_MODULE(openarm_can, m) {
         .def("set_callback_mode_all", &DMDeviceCollection::set_callback_mode_all,
              nb::arg("callback_mode"))
         .def("query_param_all", &DMDeviceCollection::query_param_all, nb::arg("rid"))
+        .def("query_param_one", &DMDeviceCollection::query_param_one, nb::arg("index"),
+             nb::arg("rid"))
+        .def("set_param_one", &DMDeviceCollection::set_param_one, nb::arg("index"), nb::arg("rid"),
+             nb::arg("value"))
+        .def("set_param_all", &DMDeviceCollection::set_param_all, nb::arg("rid"), nb::arg("value"))
         .def("set_control_mode_one", &DMDeviceCollection::set_control_mode_one, nb::arg("index"),
              nb::arg("mode"))
         .def("set_control_mode_all", &DMDeviceCollection::set_control_mode_all, nb::arg("mode"))

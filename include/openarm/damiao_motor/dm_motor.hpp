@@ -15,7 +15,6 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
 #include <map>
 
 #include "dm_motor_constants.hpp"
@@ -29,6 +28,12 @@ class Motor {
 public:
     // Constructor
     Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id);
+
+    // Copy constructor - deep copy of all members including temp_param_dict_
+    Motor(const Motor& other);
+
+    // Copy assignment operator
+    Motor& operator=(const Motor& other);
 
     // State getters
     double get_position() const { return state_q_; }
@@ -57,7 +62,7 @@ protected:
     void set_state_tmos(int tmos);
     void set_state_trotor(int trotor);
     void set_enabled(bool enabled);
-    void set_temp_param(int RID, int val);
+    void set_temp_param(int RID, double val);
 
     // Motor identifiers
     uint32_t send_can_id_;

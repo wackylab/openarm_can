@@ -79,6 +79,7 @@ public:
                                                      const PosForceParam& posforce_param);
     static CANPacket create_set_control_mode_command(const Motor& motor, ControlMode mode);
     static CANPacket create_query_param_command(const Motor& motor, int RID);
+    static CANPacket create_write_param_command(const Motor& motor, int RID, float value);
     static CANPacket create_refresh_command(const Motor& motor);
 
 private:
