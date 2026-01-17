@@ -19,8 +19,7 @@ import openarm_can as oa
 
 def main() -> None:
     arm = oa.OpenArm("can0", True)
-    arm.init_gripper_motor(oa.MotorType.DM4310, 0x8,
-                           0x18, oa.ControlMode.POS_FORCE)
+    arm.init_gripper_motor(oa.MotorType.DM4310, 0x8, 0x18, oa.ControlMode.POS_FORCE)
 
     arm.set_callback_mode_all(oa.CallbackMode.PARAM)
     arm.enable_all()
@@ -33,6 +32,14 @@ def main() -> None:
     gripper.open()
     time.sleep(0.4)
 
+    gripper_motor = gripper.get_motors()[0]
+    initial_kp_asr = gripper_motor.get_param(oa.MotorVariable.KP_ASR)
+    initial_ki_asr = gripper_motor.get_param(oa.MotorVariable.KI_ASR)
+    print(f"\n=== INITIAL KP/KI VALUES ===")
+    print(f"KP_ASR (speed loop Kp): {initial_kp_asr}")
+    print(f"KI_ASR (speed loop Ki): {initial_ki_asr}")
+    print(f"===========================\n")
+
     sequence = [
         (0.25, 3.0, 0.2),
         (0.25, 3.0, 0.6),
@@ -42,7 +49,34 @@ def main() -> None:
         (0.4, 6.0, 0.7),
     ]
 
-    for position, speed, torque in sequence:
+    print("=== FIRST HALF: Using DEFAULT KP/KI ===")
+    for position, speed, torque in sequence[:3]:
+        print(f"set_position({position}) speed={speed} torque={torque}")
+        gripper.set_position(position, speed_rad_s=speed, torque_pu=torque)
+        for _ in range(6):
+            arm.refresh_all()
+            arm.recv_all(500)
+            for motor in gripper.get_motors():
+                print("gripper position:", motor.get_position())
+            time.sleep(0.05)
+
+    new_kp_asr = 80.0
+    new_ki_asr = 2.0
+    print(f"\n=== WRITING NEW KP/KI VALUES ===")
+    print(f"Setting KP_ASR to: {new_kp_asr}")
+    print(f"Setting KI_ASR to: {new_ki_asr}")
+    gripper.set_param_one(0, oa.MotorVariable.KP_ASR, new_kp_asr)
+    gripper.set_param_one(0, oa.MotorVariable.KI_ASR, new_ki_asr)
+    time.sleep(0.1)
+
+    readback_kp_asr = gripper_motor.get_param(oa.MotorVariable.KP_ASR)
+    readback_ki_asr = gripper_motor.get_param(oa.MotorVariable.KI_ASR)
+    print(f"KP_ASR after write: {readback_kp_asr}")
+    print(f"KI_ASR after write: {readback_ki_asr}")
+    print(f"===============================\n")
+
+    print("=== SECOND HALF: Using NEW KP/KI (faster response) ===")
+    for position, speed, torque in sequence[3:]:
         print(f"set_position({position}) speed={speed} torque={torque}")
         gripper.set_position(position, speed_rad_s=speed, torque_pu=torque)
         for _ in range(6):
