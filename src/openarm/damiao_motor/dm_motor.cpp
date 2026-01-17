@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
 #include <openarm/damiao_motor/dm_motor.hpp>
 #include <openarm/damiao_motor/dm_motor_constants.hpp>
 #include <stdexcept>
@@ -32,36 +31,6 @@ Motor::Motor(MotorType motor_type, uint32_t send_can_id, uint32_t recv_can_id)
       state_tmos_(0),
       state_trotor_(0) {}
 
-// Copy constructor - deep copy all members including temp_param_dict_
-Motor::Motor(const Motor& other)
-    : send_can_id_(other.send_can_id_),
-      recv_can_id_(other.recv_can_id_),
-      motor_type_(other.motor_type_),
-      enabled_(other.enabled_),
-      state_q_(other.state_q_),
-      state_dq_(other.state_dq_),
-      state_tau_(other.state_tau_),
-      state_tmos_(other.state_tmos_),
-      state_trotor_(other.state_trotor_),
-      temp_param_dict_(other.temp_param_dict_) {}
-
-// Copy assignment operator
-Motor& Motor::operator=(const Motor& other) {
-    if (this != &other) {
-        send_can_id_ = other.send_can_id_;
-        recv_can_id_ = other.recv_can_id_;
-        motor_type_ = other.motor_type_;
-        enabled_ = other.enabled_;
-        state_q_ = other.state_q_;
-        state_dq_ = other.state_dq_;
-        state_tau_ = other.state_tau_;
-        state_tmos_ = other.state_tmos_;
-        state_trotor_ = other.state_trotor_;
-        temp_param_dict_ = other.temp_param_dict_;
-    }
-    return *this;
-}
-
 // Enable methods
 void Motor::set_enabled(bool enable) { this->enabled_ = enable; }
 
@@ -69,24 +38,11 @@ void Motor::set_enabled(bool enable) { this->enabled_ = enable; }
 // TODO: storing temp params in motor object might not be a good idea
 // also -1 is not a good default value, consider using a different value
 double Motor::get_param(int RID) const {
-    std::cout << "Current Motor address: " << this << std::endl;
     auto it = temp_param_dict_.find(RID);
-    std::cout << "temp_param_dict_ values: " << std::endl;
-    for (const auto& pair : temp_param_dict_) {
-        std::cout << "RID: " << pair.first << ", Value: " << pair.second << std::endl;
-    }
     return (it != temp_param_dict_.end()) ? it->second : -1;
 }
 
-void Motor::set_temp_param(int RID, double val) {
-    std::cout << "Current Motor address: " << this << std::endl;
-    std::cout << "set_temp_param called with RID: " << RID << ", val: " << val << std::endl;
-    temp_param_dict_[RID] = val;
-    std::cout << "temp_param_dict_ values: " << std::endl;
-    for (const auto& pair : temp_param_dict_) {
-        std::cout << "RID: " << pair.first << ", Value: " << pair.second << std::endl;
-    }
-}
+void Motor::set_temp_param(int RID, double val) { temp_param_dict_[RID] = val; }
 
 // State update methods
 void Motor::update_state(double q, double dq, double tau, int tmos, int trotor) {
